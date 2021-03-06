@@ -1,4 +1,12 @@
 <template>
+    <base-dialogue v-if="inputIsInvalid" title="Invalid Input" @close="confirmError">
+        <template #default>
+            <p>Unfortunately, input is invalid.</p>
+        </template>
+        <template #actions>
+            <base-button @click="confirmError">Ok</base-button>
+        </template>
+    </base-dialogue>
     <base-card>
         <form @submit.prevent="submitData">
             <div class="form-control">
@@ -21,15 +29,30 @@
 </template>
 
 <script>
+  import BaseDialogue from '../UI/BaseDialogue';
+  import BaseButton from '../UI/BaseButton';
   export default {
     name: 'AddResource',
+    components: { BaseButton, BaseDialogue },
     inject: ['addResource'],
+    data() {
+      return {
+        inputIsInvalid: false,
+      };
+    },
     methods: {
       submitData() {
         const enteredTitle = this.$refs.titleInput.value;
         const enteredDescription = this.$refs.descInput.value;
         const enteredLink = this.$refs.linkInput.value;
+        if (enteredTitle.trim() === '' || enteredDescription.trim() === '' || enteredLink.trim() === '') {
+          this.inputIsInvalid = true;
+          return;
+        }
         this.addResource(enteredTitle, enteredDescription, enteredLink);
+      },
+      confirmError() {
+        this.inputIsInvalid = false;
       },
     },
   };
